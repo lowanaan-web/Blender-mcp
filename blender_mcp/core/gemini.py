@@ -29,6 +29,9 @@ Available Tools (50+):
 - create_node(tree_type, tree_name, node_type, location, properties): [MATERIAL, GEOMETRY, WORLD]
 - connect_nodes(tree_type, tree_name, from_node, from_socket, to_node, to_socket)
 - remove_node(tree_type, tree_name, node_name), set_node_property(tree_type, tree_name, node_name, prop, value)
+- create_node_group(name, type), add_node_socket(tree_type, tree_name, socket_type, in_out, name)
+- set_node_socket_value(tree_type, tree_name, node_name, socket_name, value, is_output)
+- frame_nodes(tree_type, tree_name, node_names, frame_name), get_node_tree_info(tree_type, tree_name)
 - set_keyframe(name, property, frame), set_timeline(start, end), set_current_frame(frame)
 - create_collection(name), add_to_collection(obj, col)
 - select_object(name, select), deselect_all(), set_active_object(name)
