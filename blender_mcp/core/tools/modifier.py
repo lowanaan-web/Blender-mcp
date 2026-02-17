@@ -76,8 +76,50 @@ def add_triangulate_modifier(name):
 def add_wireframe_modifier(name, thickness=0.02):
     return add_modifier(name, type='WIREFRAME', thickness=thickness)
 
-def add_simple_deform_modifier(name, deform_type='BEND', angle=45):
-    return add_modifier(name, type='SIMPLE_DEFORM', deform_method=deform_type, angle=math.radians(angle))
+def add_simple_deform_modifier(name, deform_type='BEND', angle=45, axis='Z', origin=None, limits=(0, 1), vertex_group=""):
+    origin_obj = bpy.data.objects.get(origin) if origin else None
+    return add_modifier(name, type='SIMPLE_DEFORM',
+                        deform_method=deform_type,
+                        angle=math.radians(angle),
+                        deform_axis=axis,
+                        origin=origin_obj,
+                        limits=limits,
+                        vertex_group=vertex_group)
+
+def add_curve_modifier(name, curve_object, axis='POS_X'):
+    curve_obj = bpy.data.objects.get(curve_object)
+    return add_modifier(name, type='CURVE', object=curve_obj, deform_axis=axis)
+
+def add_warp_modifier(name, object_from, object_to, strength=1.0):
+    obj_from = bpy.data.objects.get(object_from)
+    obj_to = bpy.data.objects.get(object_to)
+    return add_modifier(name, type='WARP', object_from=obj_from, object_to=obj_to, strength=strength)
+
+def add_wave_modifier(name, motion='X', speed=0.25, height=0.5, width=1.5, narrowness=1.5):
+    use_x = 'X' in motion
+    use_y = 'Y' in motion
+    return add_modifier(name, type='WAVE', use_x=use_x, use_y=use_y, speed=speed, height=height, width=width, narrowness=narrowness)
+
+def add_cast_modifier(name, cast_type='SPHERE', factor=0.5, radius=0.0):
+    return add_modifier(name, type='CAST', cast_type=cast_type, factor=factor, radius=radius)
+
+def add_surface_deform_modifier(name, target):
+    target_obj = bpy.data.objects.get(target)
+    return add_modifier(name, type='SURFACE_DEFORM', target=target_obj)
+
+def add_mesh_deform_modifier(name, target, precision=5):
+    target_obj = bpy.data.objects.get(target)
+    return add_modifier(name, type='MESH_DEFORM', object=target_obj, precision=precision)
+
+def add_smooth_corrective_modifier(name, factor=1.0, repeat=5):
+    return add_modifier(name, type='CORRECTIVE_SMOOTH', factor=factor, iterations=repeat)
+
+def add_laplacian_smooth_modifier(name, lambda_factor=0.5, repeat=1):
+    return add_modifier(name, type='LAPLACIANSMOOTH', lambda_factor=lambda_factor, iterations=repeat)
+
+def add_hook_modifier(name, object_hook):
+    hook_obj = bpy.data.objects.get(object_hook)
+    return add_modifier(name, type='HOOK', object=hook_obj)
 
 def add_lattice_modifier(name, lattice):
     lattice_obj = bpy.data.objects.get(lattice)
