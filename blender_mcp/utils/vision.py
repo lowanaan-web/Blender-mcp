@@ -11,6 +11,9 @@ def capture_viewport():
 
         # Set render settings for viewport capture
         scene = bpy.context.scene
+        original_format = scene.render.image_settings.file_format
+        original_path = scene.render.filepath
+
         scene.render.image_settings.file_format = 'PNG'
         scene.render.filepath = file_path
 
@@ -38,6 +41,10 @@ def capture_viewport():
         else:
             # Fallback
             bpy.ops.render.opengl(write_still=True)
+
+        # Restore settings
+        scene.render.image_settings.file_format = original_format
+        scene.render.filepath = original_path
 
         return file_path
     except Exception as e:
