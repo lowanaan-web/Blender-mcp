@@ -1,2 +1,7 @@
 # Blender-mcp
-Blender mcp allows blender agent (Gemini) communicate blender to build,control, and setup things using model context protocol  with natural language 
+
+Blender MCP allows a Blender agent to communicate with Blender using the Model Context Protocol.
+
+## Contracts
+
+The versioned tool contract system lives under `src/blender_mcp/contracts/` and is documented in `docs/contracts.md`.
