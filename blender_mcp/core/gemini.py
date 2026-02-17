@@ -16,6 +16,12 @@ Available Tools (50+):
 - transform_object(name, location, rotation, scale): rotation in degrees
 - delete_object(name), duplicate_object(name, location), rename_object(old_name, new_name)
 - set_parent(child, parent), clear_parent(name), hide_object(name, hide)
+- move_to_collection(name, collection), apply_transform(name, loc, rot, scale), clear_transform(name, loc, rot, scale)
+- set_origin(name, type), add_empty(name, type, location), join_objects(names), separate_objects(name, type)
+- make_instance(name, location), convert_object(name, target), align_objects(names, axis)
+- randomize_transform(names, loc, rot, scale), copy_transforms(source, target)
+- snap_to_cursor(name), snap_cursor_to_object(name), get_object_dimensions(name), set_object_dimensions(name, dim)
+- set_display_color(name, color), set_draw_type(name, type), make_local(name), set_object_pass_index(name, index)
 - add_torus(location, name), add_monkey(location, name), add_icosphere(location, subdivisions, name)
 - subdivide_mesh(name, cuts), shade_smooth(name, smooth)
 - assign_material(name, color, metallic, roughness), remove_material(name)
