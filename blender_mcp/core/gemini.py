@@ -24,6 +24,11 @@ Available Tools (50+):
 - add_light(type, location, name): [POINT, SUN, SPOT, AREA], set_light_property(name, energy, color)
 - add_camera(location, rotation, name), set_active_camera(name)
 - add_modifier(name, type, **kwargs), remove_modifier(obj, mod), apply_modifier(obj, mod)
+- add_subsurf_modifier(name, levels), add_solidify_modifier(name, thickness), add_bevel_modifier(name, width, segments)
+- add_boolean_modifier(name, target, operation), add_array_modifier(name, count, offset), add_mirror_modifier(name, axis)
+- add_decimate_modifier(name, ratio), add_displace_modifier(name, strength), add_remesh_modifier(name, voxel_size)
+- add_screw_modifier(name, angle, steps), add_simple_deform_modifier(name, type, angle), add_wireframe_modifier(name, thickness)
+- add_shrinkwrap_modifier(name, target), add_weighted_normal_modifier(name)
 - setup_physics(name, type), setup_cloth(name), setup_collision(name), add_force_field(type, location)
 - setup_geometry_nodes(name)
 - create_node(tree_type, tree_name, node_type, location, properties): [MATERIAL, GEOMETRY, WORLD]
