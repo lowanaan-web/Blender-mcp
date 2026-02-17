@@ -52,6 +52,12 @@ Available Tools (50+):
 - create_collection(name), add_to_collection(obj, col)
 - select_object(name, select), deselect_all(), set_active_object(name)
 - clear_scene(), set_render_engine(engine), set_resolution(x, y), render_still(path)
+- set_render_samples(samples), set_denoising(enabled), set_color_management(view, look, exposure, gamma)
+- set_output_format(format, color, depth), set_background_transparent(bool), add_view_layer(name)
+- set_render_device(device), bake_physics(), set_viewport_shading(type), toggle_overlays(bool)
+- set_clipping(start, end, camera), add_sun_light_env(strength), set_mist_pass(enabled, start, depth)
+- setup_compositor_denoise(), set_render_region(use, xmin, xmax, ymin, ymax), toggle_simplify(bool)
+- set_gravity(gravity), set_units(length, mass), get_render_info(), save_file(path)
 - add_constraint(obj, type, target), import_obj(path), export_obj(path)
 - get_scene_info(), get_screenshot()
 
@@ -89,7 +95,10 @@ Important:
     def send_message(self, message, image_data=None):
         content = []
         if image_data:
-            content.append({"mime_type": "image/png", "data": image_data})
+            import base64
+            # image_data is expected to be base64 string from get_base64_viewport
+            image_bytes = base64.b64decode(image_data)
+            content.append({"mime_type": "image/png", "data": image_bytes})
         content.append(message)
 
         response = self.chat.send_message(content)
