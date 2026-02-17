@@ -58,6 +58,15 @@ class AtomicEngine:
             "add_triangulate_modifier": modifier.add_triangulate_modifier,
             "add_wireframe_modifier": modifier.add_wireframe_modifier,
             "add_simple_deform_modifier": modifier.add_simple_deform_modifier,
+            "add_curve_modifier": modifier.add_curve_modifier,
+            "add_warp_modifier": modifier.add_warp_modifier,
+            "add_wave_modifier": modifier.add_wave_modifier,
+            "add_cast_modifier": modifier.add_cast_modifier,
+            "add_surface_deform_modifier": modifier.add_surface_deform_modifier,
+            "add_mesh_deform_modifier": modifier.add_mesh_deform_modifier,
+            "add_smooth_corrective_modifier": modifier.add_smooth_corrective_modifier,
+            "add_laplacian_smooth_modifier": modifier.add_laplacian_smooth_modifier,
+            "add_hook_modifier": modifier.add_hook_modifier,
             "add_lattice_modifier": modifier.add_lattice_modifier,
             "add_shrinkwrap_modifier": modifier.add_shrinkwrap_modifier,
             "add_data_transfer_modifier": modifier.add_data_transfer_modifier,
@@ -111,9 +120,10 @@ class AtomicEngine:
             "export_obj": io.export_obj,
         }
 
-    def execute_tool(self, tool_name, args):
+    def execute_tool(self, tool_name, args=None):
         if tool_name in self.tools:
             try:
+                if args is None: args = {}
                 return self.tools[tool_name](**args)
             except Exception as e:
                 return {"status": "error", "message": str(e)}
