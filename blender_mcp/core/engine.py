@@ -1,5 +1,6 @@
 import bpy
 import json
+import math
 
 class AtomicEngine:
     def __init__(self):
@@ -51,6 +52,11 @@ class AtomicEngine:
             "connect_nodes": self.connect_nodes,
             "remove_node": self.remove_node,
             "set_node_property": self.set_node_property,
+            "create_node_group": self.create_node_group,
+            "add_node_socket": self.add_node_socket,
+            "set_node_socket_value": self.set_node_socket_value,
+            "frame_nodes": self.frame_nodes,
+            "get_node_tree_info": self.get_node_tree_info,
 
             # Animation
             "set_keyframe": self.set_keyframe,
@@ -115,7 +121,7 @@ class AtomicEngine:
         if location:
             obj.location = location
         if rotation:
-            obj.rotation_euler = [(r * 3.14159 / 180.0) for r in rotation] # Convert from degrees
+            obj.rotation_euler = [math.radians(r) for r in rotation] # Convert from degrees
         if scale:
             obj.scale = scale
         return {"status": "success"}
@@ -293,7 +299,7 @@ class AtomicEngine:
         cam_obj = bpy.data.objects.new(name, cam_data)
         bpy.context.collection.objects.link(cam_obj)
         cam_obj.location = location
-        cam_obj.rotation_euler = [(r * 3.14159 / 180.0) for r in rotation]
+        cam_obj.rotation_euler = [math.radians(r) for r in rotation]
         return {"status": "success", "name": cam_obj.name}
 
     def set_active_camera(self, name):
@@ -424,16 +430,90 @@ class AtomicEngine:
 
     def connect_nodes(self, tree_type, tree_name, from_node, from_socket, to_node, to_socket):
         if tree_type == 'MATERIAL':
-            mat = bpy.data.materials.get(tree_name)
-            tree = mat.node_tree
+            tree = bpy.data.materials.get(tree_name).node_tree
         elif tree_type == 'GEOMETRY':
             tree = bpy.data.node_groups.get(tree_name)
+        elif tree_type == 'WORLD':
+            tree = bpy.data.worlds.get(tree_name).node_tree
 
         node_from = tree.nodes.get(from_node)
         node_to = tree.nodes.get(to_node)
 
-        tree.links.new(node_from.outputs[from_socket], node_to.inputs[to_socket])
+        # Support both name and index for sockets
+        out_socket = node_from.outputs[from_socket] if isinstance(from_socket, int) else node_from.outputs.get(from_socket)
+        in_socket = node_to.inputs[to_socket] if isinstance(to_socket, int) else node_to.inputs.get(to_socket)
+
+        tree.links.new(out_socket, in_socket)
         return {"status": "success"}
+
+    def create_node_group(self, name, type='GeometryNodeTree'):
+        group = bpy.data.node_groups.new(name, type)
+        return {"status": "success", "name": group.name}
+
+    def add_node_socket(self, tree_type, tree_name, socket_type='NodeSocketFloat', in_out='INPUT', name='Socket'):
+        if tree_type == 'GEOMETRY':
+            tree = bpy.data.node_groups.get(tree_name)
+        elif tree_type == 'MATERIAL':
+            tree = bpy.data.materials.get(tree_name).node_tree
+
+        if in_out == 'INPUT':
+            socket = tree.inputs.new(socket_type, name)
+        else:
+            socket = tree.outputs.new(socket_type, name)
+        return {"status": "success", "socket_name": socket.name}
+
+    def set_node_socket_value(self, tree_type, tree_name, node_name, socket_name, value, is_output=False):
+        if tree_type == 'MATERIAL':
+            tree = bpy.data.materials.get(tree_name).node_tree
+        elif tree_type == 'GEOMETRY':
+            tree = bpy.data.node_groups.get(tree_name)
+
+        node = tree.nodes.get(node_name)
+        sockets = node.outputs if is_output else node.inputs
+        socket = sockets.get(socket_name)
+        if socket:
+            socket.default_value = value
+            return {"status": "success"}
+        return {"status": "error"}
+
+    def frame_nodes(self, tree_type, tree_name, node_names, frame_name="Frame"):
+        if tree_type == 'MATERIAL':
+            tree = bpy.data.materials.get(tree_name).node_tree
+        elif tree_type == 'GEOMETRY':
+            tree = bpy.data.node_groups.get(tree_name)
+
+        frame = tree.nodes.new('NodeFrame')
+        frame.label = frame_name
+        for name in node_names:
+            node = tree.nodes.get(name)
+            if node:
+                node.parent = frame
+        return {"status": "success", "frame_name": frame.name}
+
+    def get_node_tree_info(self, tree_type, tree_name):
+        if tree_type == 'MATERIAL':
+            tree = bpy.data.materials.get(tree_name).node_tree
+        elif tree_type == 'GEOMETRY':
+            tree = bpy.data.node_groups.get(tree_name)
+
+        info = {
+            "nodes": [],
+            "links": []
+        }
+        for node in tree.nodes:
+            info["nodes"].append({
+                "name": node.name,
+                "type": node.type,
+                "location": list(node.location)
+            })
+        for link in tree.links:
+            info["links"].append({
+                "from_node": link.from_node.name,
+                "from_socket": link.from_socket.name,
+                "to_node": link.to_node.name,
+                "to_socket": link.to_socket.name
+            })
+        return {"status": "success", "info": info}
 
     def set_keyframe(self, name, property, frame):
         obj = bpy.data.objects.get(name)
