@@ -124,3 +124,20 @@ Important:
             except json.JSONDecodeError:
                 print(f"Failed to parse command: {cmd_str}")
         return parsed_commands
+
+    @staticmethod
+    def list_available_models(api_key):
+        try:
+            genai.configure(api_key=api_key)
+            models = genai.list_models()
+            available = []
+            for m in models:
+                if 'generateContent' in m.supported_generation_methods:
+                    available.append({
+                        "name": m.name.split('/')[-1],
+                        "display_name": m.display_name
+                    })
+            return available
+        except Exception as e:
+            print(f"Error listing models: {e}")
+            return []

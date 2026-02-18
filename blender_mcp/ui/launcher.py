@@ -18,6 +18,24 @@ class UIBridge:
     def init_gemini(self, api_key, model_name):
         self.gemini = GeminiManager(api_key, model_name)
 
+    def get_settings(self):
+        prefs = bpy.context.preferences.addons['blender_mcp'].preferences
+        return {
+            "api_key": prefs.api_key,
+            "model_name": prefs.model_name
+        }
+
+    def update_settings(self, api_key, model_name):
+        prefs = bpy.context.preferences.addons['blender_mcp'].preferences
+        prefs.api_key = api_key
+        prefs.model_name = model_name
+        # Re-init Gemini with new settings
+        self.init_gemini(api_key, model_name)
+        return {"status": "success"}
+
+    def fetch_available_models(self, api_key):
+        return GeminiManager.list_available_models(api_key)
+
     def send_to_gemini(self, message):
         if not self.gemini:
             return "Please configure your Gemini API Key in Blender preferences first."
