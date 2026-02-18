@@ -181,8 +181,7 @@
             <div class="form-group">
                 <label>Model Selector</label>
                 <select id="modelSelect">
-                    <option value="gemini-1.5-flash">Gemini 1.5 Flash (Default)</option>
-                    <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+                    <option value="">Select a model...</option>
                 </select>
             </div>
             <div class="flex-grow"></div>
@@ -246,7 +245,7 @@
                 }
             } catch (e) {
                 console.error("Failed to fetch models", e);
-                select.innerHTML = '<option value="gemini-1.5-flash">Gemini 1.5 Flash (Fallback)</option><option value="gemini-1.5-pro">Gemini 1.5 Pro</option>';
+                select.innerHTML = '<option value="">Error loading models</option>';
             }
         }
 

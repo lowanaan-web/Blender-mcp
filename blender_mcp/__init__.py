@@ -21,13 +21,10 @@ class BlenderMCPPreferences(bpy.types.AddonPreferences):
         description="Enter your Gemini API Key",
         subtype='PASSWORD',
     )
-    model_name: bpy.props.EnumProperty(
+    model_name: bpy.props.StringProperty(
         name="Model",
-        items=[
-            ('gemini-1.5-pro', "Gemini 1.5 Pro", ""),
-            ('gemini-1.5-flash', "Gemini 1.5 Flash", ""),
-        ],
-        default='gemini-1.5-flash',
+        description="Gemini Model ID",
+        default="gemini-1.5-flash",
     )
 
     def draw(self, context):
