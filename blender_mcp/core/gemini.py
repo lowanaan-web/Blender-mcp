@@ -69,7 +69,9 @@ Available Tools (50+):
 - setup_compositor_denoise(), set_render_region(use, xmin, xmax, ymin, ymax), toggle_simplify(bool)
 - set_gravity(gravity), set_units(length, mass), get_render_info(), save_file(path)
 - add_constraint(obj, type, target), import_obj(path), export_obj(path)
-- get_scene_info(), get_screenshot()
+- list_assets(), import_asset(name), setup_pbr_material(name, base, norm, rough, met)
+- setup_fluid_domain(name), setup_fluid_flow(name), setup_smoke_domain(name), setup_smoke_flow(name), setup_soft_body(name)
+- audit_scene(), get_scene_info(), get_screenshot(), request_feedback(message)
 
 Example:
 "I'll build a physics scene with a cloth and a wind force."
@@ -91,7 +93,8 @@ Example:
 
 Important:
 - Use atomic tools to build complex scenes step-by-step.
-- After performing actions, you can suggest next steps or ask the user if they want you to verify the results.
+- After performing actions, you can suggest next steps.
+- If you need to verify your work immediately, use request_feedback(message). This will trigger an automatic screenshot and a new request to you with the visual result.
 - You have VISION capabilities. You receive a screenshot of the viewport with every message. Use it to verify your work.
 - If you need a fresh screenshot or more scene data, you can ask the user or use get_scene_info().
 - Always provide a brief explanation of what you are doing.

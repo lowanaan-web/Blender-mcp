@@ -26,6 +26,10 @@ def get_screenshot():
         return {"status": "success", "image_data": data}
     return {"status": "error", "message": "Failed to capture screenshot"}
 
+def request_feedback(message="Please verify the result"):
+    # This is a marker tool for the UI to trigger a loop
+    return {"status": "success", "feedback_requested": True, "message": message}
+
 def get_scene_info():
     info = {
         "objects": [],
@@ -226,3 +230,28 @@ def save_file(filepath=None):
     else:
         bpy.ops.wm.save_mainfile()
     return {"status": "success"}
+
+def audit_scene():
+    """Provides detailed analysis of the scene (polycount, materials, modifiers)."""
+    stats = {
+        "total_objects": len(bpy.data.objects),
+        "total_vertices": 0,
+        "total_faces": 0,
+        "objects_audit": []
+    }
+
+    for obj in bpy.data.objects:
+        if obj.type == 'MESH':
+            stats["total_vertices"] += len(obj.data.vertices)
+            stats["total_faces"] += len(obj.data.polygons)
+
+        obj_audit = {
+            "name": obj.name,
+            "type": obj.type,
+            "polycount": len(obj.data.polygons) if obj.type == 'MESH' else 0,
+            "modifiers": [m.type for m in obj.modifiers],
+            "materials": [slot.material.name for slot in obj.material_slots if slot.material]
+        }
+        stats["objects_audit"].append(obj_audit)
+
+    return {"status": "success", "audit": stats}

@@ -38,7 +38,7 @@ class UIBridge:
 
     def send_to_gemini(self, message):
         if not self.gemini:
-            return "Please configure your Gemini API Key in Blender preferences first."
+            return {"text": "Please configure your Gemini API Key in Blender preferences first.", "feedback_loop": False}
 
         # Automatically take screenshot on main thread
         import threading
@@ -60,14 +60,27 @@ class UIBridge:
 
         # Extract and execute commands
         commands = self.gemini.extract_commands(response_text)
+        feedback_requested = False
+        feedback_message = ""
+
         for cmd in commands:
-            # Execute in Blender's main thread?
-            # pywebview calls are in a separate thread, so we need to be careful with bpy
-            # We'll use a timer or a queue if needed, but for now let's try direct call
-            # (In production, use bpy.app.timers to run on main thread)
+            # Execute and check for feedback request
+            # Since we execute in main thread via timer, we need a way to get results back
+            # For feedback loop, we'll assume the engine returns it
+            # Actually, execute_tool returns the dict. Let's make execute_in_main_thread return it or handle it.
+
+            # For simplicity, we'll check if any command is request_feedback
+            if cmd['tool'] == 'request_feedback':
+                feedback_requested = True
+                feedback_message = cmd['args'].get('message', 'Result of previous action.')
+
             self.execute_in_main_thread(cmd)
 
-        return response_text
+        return {
+            "text": response_text,
+            "feedback_loop": feedback_requested,
+            "feedback_message": feedback_message
+        }
 
     def execute_in_main_thread(self, cmd):
         def run():
