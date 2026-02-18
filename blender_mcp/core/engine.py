@@ -178,6 +178,24 @@ class AtomicEngine:
 
             # Constraints
             "add_constraint": constraint.add_constraint,
+            "add_copy_location_constraint": constraint.add_copy_location_constraint,
+            "add_copy_rotation_constraint": constraint.add_copy_rotation_constraint,
+            "add_copy_scale_constraint": constraint.add_copy_scale_constraint,
+            "add_copy_transforms_constraint": constraint.add_copy_transforms_constraint,
+            "add_limit_location_constraint": constraint.add_limit_location_constraint,
+            "add_limit_rotation_constraint": constraint.add_limit_rotation_constraint,
+            "add_limit_scale_constraint": constraint.add_limit_scale_constraint,
+            "add_limit_distance_constraint": constraint.add_limit_distance_constraint,
+            "add_track_to_constraint": constraint.add_track_to_constraint,
+            "add_damped_track_constraint": constraint.add_damped_track_constraint,
+            "add_follow_path_constraint": constraint.add_follow_path_constraint,
+            "add_shrinkwrap_constraint": constraint.add_shrinkwrap_constraint,
+            "add_child_of_constraint": constraint.add_child_of_constraint,
+            "add_ik_constraint": constraint.add_ik_constraint,
+            "remove_constraint": constraint.remove_constraint,
+            "clear_constraints": constraint.clear_constraints,
+            "set_constraint_influence": constraint.set_constraint_influence,
+            "get_constraints_info": constraint.get_constraints_info,
 
             # Selection & Context
             "select_object": selection.select_object,
