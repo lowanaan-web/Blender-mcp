@@ -1,5 +1,6 @@
 import bpy
 from .tools import (
+    sculpt,
     object, mesh, material, light, modifier,
     physics, node, animation, collection,
     scene, selection, constraint, io, asset
@@ -212,6 +213,42 @@ class AtomicEngine:
             # Import/Export
             "import_obj": io.import_obj,
             "export_obj": io.export_obj,
+
+                        # Sculpting
+            "set_sculpt_mode": sculpt.set_sculpt_mode,
+            "select_brush": sculpt.select_brush,
+            "set_brush_property": sculpt.set_brush_property,
+            "toggle_dyntopo": sculpt.toggle_dyntopo,
+            "set_dyntopo_detail": sculpt.set_dyntopo_detail,
+            "mask_all": sculpt.mask_all,
+            "clear_mask": sculpt.clear_mask,
+            "invert_mask": sculpt.invert_mask,
+            "smooth_mask": sculpt.smooth_mask,
+            "sharpen_mask": sculpt.sharpen_mask,
+            "grow_mask": sculpt.grow_mask,
+            "shrink_mask": sculpt.shrink_mask,
+            "mask_by_cavity": sculpt.mask_by_cavity,
+            "create_face_set_from_masked": sculpt.create_face_set_from_masked,
+            "create_face_set_from_visible": sculpt.create_face_set_from_visible,
+            "invert_face_sets": sculpt.invert_face_sets,
+            "hide_active_face_set": sculpt.hide_active_face_set,
+            "reveal_all_face_sets": sculpt.reveal_all_face_sets,
+            "set_voxel_size": sculpt.set_voxel_size,
+            "voxel_remesh": sculpt.voxel_remesh,
+            "set_sculpt_symmetry": sculpt.set_sculpt_symmetry,
+            "optimize_sculpt_mesh": sculpt.optimize_sculpt_mesh,
+            "set_brush_spacing": sculpt.set_brush_spacing,
+            "set_brush_falloff": sculpt.set_brush_falloff,
+            "toggle_sculpt_overlay": sculpt.toggle_sculpt_overlay,
+            "sample_detail_size": sculpt.sample_detail_size,
+            "set_dyntopo_refine_method": sculpt.set_dyntopo_refine_method,
+            "trim_mesh": sculpt.trim_mesh,
+            "apply_base": sculpt.apply_base,
+            "get_sculpt_stats": sculpt.get_sculpt_stats,
+            "set_brush_texture": sculpt.set_brush_texture,
+            "set_stroke_method": sculpt.set_stroke_method,
+            "toggle_steady_stroke": sculpt.toggle_steady_stroke,
+            "set_brush_color_panel": sculpt.set_brush_color_panel,
 
             # Asset & Materials
             "list_assets": asset.list_assets,
