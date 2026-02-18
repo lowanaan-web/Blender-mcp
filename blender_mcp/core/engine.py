@@ -2,7 +2,7 @@ import bpy
 from .tools import (
     object, mesh, material, light, modifier,
     physics, node, animation, collection,
-    scene, selection, constraint, io
+    scene, selection, constraint, io, asset
 )
 
 class AtomicEngine:
@@ -97,6 +97,11 @@ class AtomicEngine:
             "setup_cloth": physics.setup_cloth,
             "setup_collision": physics.setup_collision,
             "add_force_field": physics.add_force_field,
+            "setup_fluid_domain": physics.setup_fluid_domain,
+            "setup_fluid_flow": physics.setup_fluid_flow,
+            "setup_smoke_domain": physics.setup_smoke_domain,
+            "setup_smoke_flow": physics.setup_smoke_flow,
+            "setup_soft_body": physics.setup_soft_body,
 
             # Nodes
             "setup_geometry_nodes": node.setup_geometry_nodes,
@@ -144,6 +149,7 @@ class AtomicEngine:
             # Scene & Rendering
             "get_scene_info": scene.get_scene_info,
             "get_screenshot": scene.get_screenshot,
+            "request_feedback": scene.request_feedback,
             "clear_scene": scene.clear_scene,
             "set_render_engine": scene.set_render_engine,
             "set_resolution": scene.set_resolution,
@@ -168,6 +174,7 @@ class AtomicEngine:
             "set_units": scene.set_units,
             "get_render_info": scene.get_render_info,
             "save_file": scene.save_file,
+            "audit_scene": scene.audit_scene,
 
             # Constraints
             "add_constraint": constraint.add_constraint,
@@ -195,6 +202,11 @@ class AtomicEngine:
             # Import/Export
             "import_obj": io.import_obj,
             "export_obj": io.export_obj,
+
+            # Asset & Materials
+            "list_assets": asset.list_assets,
+            "import_asset": asset.import_asset,
+            "setup_pbr_material": asset.setup_pbr_material,
         }
 
     def execute_tool(self, tool_name, args=None):
