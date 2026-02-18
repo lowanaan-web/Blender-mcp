@@ -3,7 +3,7 @@ import json
 import re
 
 class GeminiManager:
-    def __init__(self, api_key, model_name="gemini-1.5-flash"):
+    def __init__(self, api_key, model_name):
         genai.configure(api_key=api_key)
 
         self.system_instruction = """
