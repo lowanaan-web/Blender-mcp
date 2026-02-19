@@ -3,7 +3,7 @@ from .tools import (
     sculpt,
     object, mesh, material, light, modifier,
     physics, node, animation, collection,
-    scene, selection, constraint, io, asset
+    scene, selection, constraint, io, asset, deformation
 )
 
 class AtomicEngine:
@@ -45,6 +45,16 @@ class AtomicEngine:
             "add_icosphere": mesh.add_icosphere,
             "subdivide_mesh": mesh.subdivide_mesh,
             "shade_smooth": mesh.shade_smooth,
+            "extrude_selected_faces": mesh.extrude_selected_faces,
+            "inset_selected_faces": mesh.inset_selected_faces,
+            "bevel_selected_edges": mesh.bevel_selected_edges,
+            "add_loop_cut_slide": mesh.add_loop_cut_slide,
+            "bridge_edge_loops": mesh.bridge_edge_loops,
+            "spin_selected_region": mesh.spin_selected_region,
+            "knife_project_cut": mesh.knife_project_cut,
+            "fill_holes": mesh.fill_holes,
+            "separate_mesh_selection": mesh.separate_mesh_selection,
+            "symmetrize_mesh": mesh.symmetrize_mesh,
 
             # Materials & Textures
             "assign_material": material.assign_material,
@@ -92,6 +102,14 @@ class AtomicEngine:
             "add_shrinkwrap_modifier": modifier.add_shrinkwrap_modifier,
             "add_data_transfer_modifier": modifier.add_data_transfer_modifier,
             "add_weighted_normal_modifier": modifier.add_weighted_normal_modifier,
+            "apply_boolean_difference": modifier.apply_boolean_difference,
+            "apply_boolean_slice": modifier.apply_boolean_slice,
+
+            # Deformation
+            "apply_simple_deform_bend": deformation.apply_simple_deform_bend,
+            "apply_lattice_deform": deformation.apply_lattice_deform,
+            "create_loft_curve": deformation.create_loft_curve,
+            "bend_mesh_along_curve": deformation.bend_mesh_along_curve,
 
             # Physics
             "setup_physics": physics.setup_physics,

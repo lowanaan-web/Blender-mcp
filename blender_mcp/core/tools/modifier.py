@@ -255,3 +255,37 @@ def add_mask_modifier(obj_name):
     if not obj: return {"status": "error"}
     mod = obj.modifiers.new(name="Mask", type='MASK')
     return {"status": "success", "name": mod.name}
+
+def apply_boolean_difference(obj_name, target_name):
+    res = add_boolean_modifier(obj_name, target_name, operation='DIFFERENCE')
+    if res["status"] == "success":
+        return apply_modifier(obj_name, res["name"])
+    return res
+
+def apply_boolean_slice(obj_name, target_name):
+    obj = bpy.data.objects.get(obj_name)
+    target = bpy.data.objects.get(target_name)
+    if not obj or not target: return {"status": "error", "message": "Invalid objects"}
+
+    # Duplicate original
+    bpy.ops.object.select_all(action='DESELECT')
+    obj.select_set(True)
+    bpy.context.view_layer.objects.active = obj
+    bpy.ops.object.duplicate()
+    slice_obj = bpy.context.active_object
+    slice_obj.name = f"{obj.name}_slice"
+
+    # Intersect on slice
+    mod_int = slice_obj.modifiers.new(name="Boolean_Slice", type='BOOLEAN')
+    mod_int.object = target
+    mod_int.operation = 'INTERSECT'
+    bpy.ops.object.modifier_apply(modifier=mod_int.name)
+
+    # Difference on original
+    mod_diff = obj.modifiers.new(name="Boolean_Difference", type='BOOLEAN')
+    mod_diff.object = target
+    mod_diff.operation = 'DIFFERENCE'
+    bpy.context.view_layer.objects.active = obj
+    bpy.ops.object.modifier_apply(modifier=mod_diff.name)
+
+    return {"status": "success", "original": obj.name, "slice": slice_obj.name}
