@@ -234,3 +234,154 @@ def set_curve_extrude(name, extrude=0.1):
     if not obj or obj.type != 'CURVE': return {"status": "error"}
     obj.data.extrude = extrude
     return {"status": "success"}
+
+def extrude_selected_faces(obj_name):
+    obj = _get_obj(obj_name)
+    if not obj or obj.type != 'MESH': return {"status": "error", "message": "Invalid mesh object"}
+    _enter_edit_mode(obj)
+    bpy.ops.mesh.extrude_region_move()
+    _exit_edit_mode()
+    return {"status": "success"}
+
+def inset_selected_faces(obj_name, thickness=0.01, depth=0.0):
+    obj = _get_obj(obj_name)
+    if not obj or obj.type != 'MESH': return {"status": "error"}
+    _enter_edit_mode(obj)
+    bpy.ops.mesh.inset(thickness=thickness, depth=depth)
+    _exit_edit_mode()
+    return {"status": "success"}
+
+def bevel_selected_edges(obj_name, offset=0.1, segments=3):
+    obj = _get_obj(obj_name)
+    if not obj or obj.type != 'MESH': return {"status": "error"}
+    _enter_edit_mode(obj)
+    bpy.ops.mesh.bevel(offset=offset, segments=segments)
+    _exit_edit_mode()
+    return {"status": "success"}
+
+def add_loop_cut_slide(obj_name, number_cuts=1, edge_index=0):
+    obj = _get_obj(obj_name)
+    if not obj or obj.type != 'MESH': return {"status": "error"}
+    _enter_edit_mode(obj)
+    try:
+        bpy.ops.mesh.loopcut_slide(
+            MESH_OT_loopcut={"number_cuts": number_cuts, "object_index": 0, "edge_index": edge_index}
+        )
+        _exit_edit_mode()
+        return {"status": "success"}
+    except Exception as e:
+        _exit_edit_mode()
+        return {"status": "error", "message": str(e)}
+
+def spin_selected_region(obj_name, steps=16, angle=360.0, axis=(0,0,1), center=(0,0,0)):
+    obj = _get_obj(obj_name)
+    if not obj or obj.type != 'MESH': return {"status": "error"}
+    _enter_edit_mode(obj)
+    bpy.ops.mesh.spin(steps=steps, angle=math.radians(angle), axis=axis, center=center)
+    _exit_edit_mode()
+    return {"status": "success"}
+
+def knife_project_cut(obj_name, cutter_name, cut_through=False):
+    obj = _get_obj(obj_name)
+    cutter = _get_obj(cutter_name)
+    if not obj or not cutter: return {"status": "error"}
+
+    bpy.ops.object.select_all(action='DESELECT')
+    cutter.select_set(True)
+    obj.select_set(True)
+    bpy.context.view_layer.objects.active = obj
+
+    _enter_edit_mode(obj)
+    try:
+        bpy.ops.mesh.knife_project(cut_through=cut_through)
+        _exit_edit_mode()
+        return {"status": "success"}
+    except Exception as e:
+        _exit_edit_mode()
+        return {"status": "error", "message": str(e)}
+
+def separate_mesh_selection(obj_name, type='SELECTED'):
+    obj = _get_obj(obj_name)
+    if not obj or obj.type != 'MESH': return {"status": "error"}
+    _enter_edit_mode(obj)
+    bpy.ops.mesh.separate(type=type)
+    _exit_edit_mode()
+    return {"status": "success"}
+
+def symmetrize_mesh(obj_name, direction='NEGATIVE_X'):
+    obj = _get_obj(obj_name)
+    if not obj or obj.type != 'MESH': return {"status": "error"}
+    _enter_edit_mode(obj)
+    bpy.ops.mesh.symmetrize(direction=direction)
+    _exit_edit_mode()
+    return {"status": "success"}
+
+def fill_holes(obj_name, sides=4):
+    obj = _get_obj(obj_name)
+    if not obj or obj.type != 'MESH': return {"status": "error"}
+    _enter_edit_mode(obj)
+    bpy.ops.mesh.fill_holes(sides=sides)
+    _exit_edit_mode()
+    return {"status": "success"}
+
+def apply_simple_deform_bend(obj_name, angle=45.0, axis='Z'):
+    obj = _get_obj(obj_name)
+    if not obj: return {"status": "error"}
+    mod = obj.modifiers.new(name="Bend", type='SIMPLE_DEFORM')
+    mod.deform_method = 'BEND'
+    mod.angle = math.radians(angle)
+    mod.deform_axis = axis
+
+    bpy.context.view_layer.objects.active = obj
+    bpy.ops.object.modifier_apply(modifier=mod.name)
+    return {"status": "success"}
+
+def apply_lattice_deform(obj_name, lattice_name):
+    obj = _get_obj(obj_name)
+    lat = _get_obj(lattice_name)
+    if not obj or not lat: return {"status": "error"}
+
+    mod = obj.modifiers.new(name="Lattice", type='LATTICE')
+    mod.object = lat
+
+    bpy.context.view_layer.objects.active = obj
+    bpy.ops.object.modifier_apply(modifier=mod.name)
+    return {"status": "success"}
+
+def create_loft_curve(name, points_list, bridge=True):
+    curve_data = bpy.data.curves.new(name, type='CURVE')
+    curve_data.dimensions = '3D'
+
+    for points in points_list:
+        spline = curve_data.splines.new('BEZIER')
+        spline.bezier_points.add(len(points) - 1)
+        for i, p in enumerate(points):
+            spline.bezier_points[i].co = p
+            spline.bezier_points[i].handle_left = (p[0]-0.1, p[1], p[2])
+            spline.bezier_points[i].handle_right = (p[0]+0.1, p[1], p[2])
+
+    obj = bpy.data.objects.new(name, curve_data)
+    bpy.context.collection.objects.link(obj)
+
+    if bridge:
+        bpy.context.view_layer.objects.active = obj
+        bpy.ops.object.select_all(action='DESELECT')
+        obj.select_set(True)
+        bpy.ops.object.convert(target='MESH')
+        _enter_edit_mode(obj)
+        bpy.ops.mesh.select_all(action='SELECT')
+        bpy.ops.mesh.bridge_edge_loops()
+        _exit_edit_mode()
+
+    return {"status": "success", "name": obj.name}
+
+def bend_mesh_along_curve(obj_name, curve_name, deform_axis='POS_X'):
+    obj = _get_obj(obj_name)
+    curve = _get_obj(curve_name)
+    if not obj or not curve: return {"status": "error"}
+
+    mod = obj.modifiers.new(name="CurveDeform", type='CURVE')
+    mod.object = curve
+    mod.deform_axis = deform_axis
+
+    return {"status": "success", "name": mod.name}
