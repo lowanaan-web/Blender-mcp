@@ -1,5 +1,6 @@
 import bpy
 from .tools import (
+    modeling,
     sculpt,
     object, mesh, material, light, modifier,
     physics, node, animation, collection,
@@ -45,6 +46,13 @@ class AtomicEngine:
             "add_icosphere": mesh.add_icosphere,
             "subdivide_mesh": mesh.subdivide_mesh,
             "shade_smooth": mesh.shade_smooth,
+            # Mesh Cleanup
+            "remove_doubles": mesh.remove_doubles,
+            "fill_holes": mesh.fill_holes,
+            "recalculate_normals": mesh.recalculate_normals,
+            "mesh_cleanup": mesh.mesh_cleanup,
+            "decimate_mesh": mesh.decimate_mesh,
+            "triangulate_mesh": mesh.triangulate_mesh,
 
             # Materials & Textures
             "assign_material": material.assign_material,
@@ -214,7 +222,26 @@ class AtomicEngine:
             "import_obj": io.import_obj,
             "export_obj": io.export_obj,
 
-                        # Sculpting
+                                    # Modeling & Construction
+            "extrude_faces": modeling.extrude_faces,
+            "inset_faces": modeling.inset_faces,
+            "loop_cut": modeling.loop_cut,
+            "bridge_edge_loops": modeling.bridge_edge_loops,
+            "boolean_cut": modeling.boolean_cut,
+            "spin_mesh": modeling.spin_mesh,
+            "screw_mesh": modeling.screw_mesh,
+            "add_bezier_curve": modeling.add_bezier_curve,
+            "add_nurbs_path": modeling.add_nurbs_path,
+            "set_curve_bevel": modeling.set_curve_bevel,
+            "convert_curve_to_mesh": modeling.convert_curve_to_mesh,
+            "knife_project": modeling.knife_project,
+            "bisect_mesh": modeling.bisect_mesh,
+            "edge_split": modeling.edge_split,
+            "add_lattice": modeling.add_lattice,
+            "apply_lattice_modifier": modeling.apply_lattice_modifier,
+            "set_curve_extrude": modeling.set_curve_extrude,
+
+            # Sculpting
             "set_sculpt_mode": sculpt.set_sculpt_mode,
             "select_brush": sculpt.select_brush,
             "set_brush_property": sculpt.set_brush_property,
