@@ -100,6 +100,8 @@ class AtomicEngine:
             "add_shrinkwrap_modifier": modifier.add_shrinkwrap_modifier,
             "add_data_transfer_modifier": modifier.add_data_transfer_modifier,
             "add_weighted_normal_modifier": modifier.add_weighted_normal_modifier,
+            "apply_boolean_difference": modifier.apply_boolean_difference,
+            "apply_boolean_slice": modifier.apply_boolean_slice,
 
             # Physics
             "setup_physics": physics.setup_physics,
@@ -240,6 +242,19 @@ class AtomicEngine:
             "add_lattice": modeling.add_lattice,
             "apply_lattice_modifier": modeling.apply_lattice_modifier,
             "set_curve_extrude": modeling.set_curve_extrude,
+            "extrude_selected_faces": modeling.extrude_selected_faces,
+            "inset_selected_faces": modeling.inset_selected_faces,
+            "bevel_selected_edges": modeling.bevel_selected_edges,
+            "add_loop_cut_slide": modeling.add_loop_cut_slide,
+            "spin_selected_region": modeling.spin_selected_region,
+            "knife_project_cut": modeling.knife_project_cut,
+            "fill_holes": modeling.fill_holes,
+            "separate_mesh_selection": modeling.separate_mesh_selection,
+            "symmetrize_mesh": modeling.symmetrize_mesh,
+            "apply_simple_deform_bend": modeling.apply_simple_deform_bend,
+            "apply_lattice_deform": modeling.apply_lattice_deform,
+            "create_loft_curve": modeling.create_loft_curve,
+            "bend_mesh_along_curve": modeling.bend_mesh_along_curve,
 
             # Sculpting
             "set_sculpt_mode": sculpt.set_sculpt_mode,
