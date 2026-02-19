@@ -8,7 +8,7 @@ def test_sculpt_tools():
     sculpt_features = [
         "set_sculpt_mode", "select_brush", "toggle_dyntopo",
         "mask_all", "voxel_remesh", "set_sculpt_symmetry",
-        "get_sculpt_stats", "toggle_steady_stroke"
+        "get_sculpt_stats", "set_steady_stroke"
     ]
     for f in sculpt_features:
         if f not in engine.tools:

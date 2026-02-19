@@ -1,137 +1,257 @@
 import bpy
-import math
 
-def add_modifier(name, type="SUBSURF", **kwargs):
-    obj = bpy.data.objects.get(name)
-    if not obj:
-        return {"status": "error", "message": f"Object {name} not found"}
+def _get_obj(name):
+    return bpy.data.objects.get(name)
 
-    mod = obj.modifiers.new(name="MCP_Modifier", type=type)
-    for key, value in kwargs.items():
-        if hasattr(mod, key):
-            setattr(mod, key, value)
-    return {"status": "success", "modifier": mod.name}
+def add_modifier(obj_name, type, name=None):
+    obj = _get_obj(obj_name)
+    if not obj: return {"status": "error"}
+    mod = obj.modifiers.new(name=name or type, type=type)
+    return {"status": "success", "name": mod.name}
 
 def remove_modifier(obj_name, mod_name):
-    obj = bpy.data.objects.get(obj_name)
+    obj = _get_obj(obj_name)
+    if not obj: return {"status": "error"}
     mod = obj.modifiers.get(mod_name)
-    if obj and mod:
+    if mod:
         obj.modifiers.remove(mod)
         return {"status": "success"}
     return {"status": "error"}
 
 def apply_modifier(obj_name, mod_name):
-    obj = bpy.data.objects.get(obj_name)
-    if obj:
-        bpy.context.view_layer.objects.active = obj
-        try:
-            bpy.ops.object.modifier_apply(modifier=mod_name)
-            return {"status": "success"}
-        except: return {"status": "error"}
-    return {"status": "error"}
+    obj = _get_obj(obj_name)
+    if not obj: return {"status": "error"}
+    bpy.context.view_layer.objects.active = obj
+    try:
+        bpy.ops.object.modifier_apply(modifier=mod_name)
+        return {"status": "success"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
 
-def add_subsurf_modifier(name, levels=1, render_levels=2):
-    return add_modifier(name, type='SUBSURF', levels=levels, render_levels=render_levels)
+# Specialized modifiers
+def add_subsurf_modifier(obj_name, levels=1, render_levels=2):
+    obj = _get_obj(obj_name)
+    if not obj: return {"status": "error"}
+    mod = obj.modifiers.new(name="Subsurf", type='SUBSURF')
+    mod.levels = levels
+    mod.render_levels = render_levels
+    return {"status": "success", "name": mod.name}
 
-def add_solidify_modifier(name, thickness=0.01):
-    return add_modifier(name, type='SOLIDIFY', thickness=thickness)
+def add_boolean_modifier(obj_name, target_name, operation='DIFFERENCE'):
+    obj = _get_obj(obj_name)
+    target = _get_obj(target_name)
+    if not obj or not target: return {"status": "error"}
+    mod = obj.modifiers.new(name="Boolean", type='BOOLEAN')
+    mod.object = target
+    mod.operation = operation
+    return {"status": "success", "name": mod.name}
 
-def add_bevel_modifier(name, width=0.1, segments=3):
-    return add_modifier(name, type='BEVEL', width=width, segments=segments)
+def add_array_modifier(obj_name, count=2, offset=(1.0, 0.0, 0.0)):
+    obj = _get_obj(obj_name)
+    if not obj: return {"status": "error"}
+    mod = obj.modifiers.new(name="Array", type='ARRAY')
+    mod.count = count
+    mod.use_relative_offset = True
+    mod.relative_offset_displace = offset
+    return {"status": "success", "name": mod.name}
 
-def add_boolean_modifier(name, target, operation='DIFFERENCE'):
-    target_obj = bpy.data.objects.get(target)
-    return add_modifier(name, type='BOOLEAN', object=target_obj, operation=operation)
+def add_mirror_modifier(obj_name, use_x=True, use_y=False, use_z=False):
+    obj = _get_obj(obj_name)
+    if not obj: return {"status": "error"}
+    mod = obj.modifiers.new(name="Mirror", type='MIRROR')
+    mod.use_axis[0] = use_x
+    mod.use_axis[1] = use_y
+    mod.use_axis[2] = use_z
+    return {"status": "success", "name": mod.name}
 
-def add_array_modifier(name, count=2, offset=(1.0, 0.0, 0.0)):
-    return add_modifier(name, type='ARRAY', count=count, use_relative_offset=True, relative_offset_displace=offset)
+def add_bevel_modifier(obj_name, width=0.1, segments=3):
+    obj = _get_obj(obj_name)
+    if not obj: return {"status": "error"}
+    mod = obj.modifiers.new(name="Bevel", type='BEVEL')
+    mod.width = width
+    mod.segments = segments
+    return {"status": "success", "name": mod.name}
 
-def add_mirror_modifier(name, use_axis=(True, False, False)):
-    return add_modifier(name, type='MIRROR', use_axis=use_axis)
+def add_solidify_modifier(obj_name, thickness=0.1):
+    obj = _get_obj(obj_name)
+    if not obj: return {"status": "error"}
+    mod = obj.modifiers.new(name="Solidify", type='SOLIDIFY')
+    mod.thickness = thickness
+    return {"status": "success", "name": mod.name}
 
-def add_decimate_modifier(name, ratio=0.5):
-    return add_modifier(name, type='DECIMATE', ratio=ratio)
+def add_displace_modifier(obj_name, texture_name=None, strength=1.0):
+    obj = _get_obj(obj_name)
+    if not obj: return {"status": "error"}
+    mod = obj.modifiers.new(name="Displace", type='DISPLACE')
+    if texture_name:
+        tex = bpy.data.textures.get(texture_name)
+        if tex: mod.texture = tex
+    mod.strength = strength
+    return {"status": "success", "name": mod.name}
 
-def add_displace_modifier(name, strength=1.0):
-    return add_modifier(name, type='DISPLACE', strength=strength)
+def add_simple_deform_modifier(obj_name, type='BEND', angle=45.0):
+    import math
+    obj = _get_obj(obj_name)
+    if not obj: return {"status": "error"}
+    mod = obj.modifiers.new(name="SimpleDeform", type='SIMPLE_DEFORM')
+    mod.deform_method = type
+    mod.angle = math.radians(angle)
+    return {"status": "success", "name": mod.name}
 
-def add_mask_modifier(name):
-    return add_modifier(name, type='MASK')
+def add_decimate_modifier(obj_name, ratio=0.5):
+    obj = _get_obj(obj_name)
+    if not obj: return {"status": "error"}
+    mod = obj.modifiers.new(name="Decimate", type='DECIMATE')
+    mod.ratio = ratio
+    return {"status": "success", "name": mod.name}
 
-def add_multires_modifier(name):
-    return add_modifier(name, type='MULTIRES')
+def add_multires_modifier(obj_name):
+    obj = _get_obj(obj_name)
+    if not obj: return {"status": "error"}
+    mod = obj.modifiers.new(name="Multires", type='MULTIRES')
+    return {"status": "success", "name": mod.name}
 
-def add_remesh_modifier(name, voxel_size=0.1):
-    return add_modifier(name, type='REMESH', voxel_size=voxel_size)
+def add_remesh_modifier(obj_name, voxel_size=0.1):
+    obj = _get_obj(obj_name)
+    if not obj: return {"status": "error"}
+    mod = obj.modifiers.new(name="Remesh", type='REMESH')
+    mod.voxel_size = voxel_size
+    return {"status": "success", "name": mod.name}
 
-def add_screw_modifier(name, angle=360, steps=16):
-    return add_modifier(name, type='SCREW', angle=math.radians(angle), steps=steps)
+def add_screw_modifier(obj_name, angle=360, steps=16):
+    import math
+    obj = _get_obj(obj_name)
+    if not obj: return {"status": "error"}
+    mod = obj.modifiers.new(name="Screw", type='SCREW')
+    mod.angle = math.radians(angle)
+    mod.steps = steps
+    return {"status": "success", "name": mod.name}
 
-def add_skin_modifier(name):
-    return add_modifier(name, type='SKIN')
+def add_skin_modifier(obj_name):
+    obj = _get_obj(obj_name)
+    if not obj: return {"status": "error"}
+    mod = obj.modifiers.new(name="Skin", type='SKIN')
+    return {"status": "success", "name": mod.name}
 
-def add_triangulate_modifier(name):
-    return add_modifier(name, type='TRIANGULATE')
+def add_triangulate_modifier(obj_name):
+    obj = _get_obj(obj_name)
+    if not obj: return {"status": "error"}
+    mod = obj.modifiers.new(name="Triangulate", type='TRIANGULATE')
+    return {"status": "success", "name": mod.name}
 
-def add_wireframe_modifier(name, thickness=0.02):
-    return add_modifier(name, type='WIREFRAME', thickness=thickness)
+def add_wireframe_modifier(obj_name, thickness=0.01):
+    obj = _get_obj(obj_name)
+    if not obj: return {"status": "error"}
+    mod = obj.modifiers.new(name="Wireframe", type='WIREFRAME')
+    mod.thickness = thickness
+    return {"status": "success", "name": mod.name}
 
-def add_simple_deform_modifier(name, deform_type='BEND', angle=45, axis='Z', origin=None, limits=(0, 1), vertex_group=""):
-    origin_obj = bpy.data.objects.get(origin) if origin else None
-    return add_modifier(name, type='SIMPLE_DEFORM',
-                        deform_method=deform_type,
-                        angle=math.radians(angle),
-                        deform_axis=axis,
-                        origin=origin_obj,
-                        limits=limits,
-                        vertex_group=vertex_group)
+def add_curve_modifier(obj_name, target_name):
+    obj = _get_obj(obj_name)
+    target = _get_obj(target_name)
+    if not obj or not target: return {"status": "error"}
+    mod = obj.modifiers.new(name="Curve", type='CURVE')
+    mod.object = target
+    return {"status": "success", "name": mod.name}
 
-def add_curve_modifier(name, curve_object, axis='POS_X'):
-    curve_obj = bpy.data.objects.get(curve_object)
-    return add_modifier(name, type='CURVE', object=curve_obj, deform_axis=axis)
+def add_warp_modifier(obj_name, object_from, object_to):
+    obj = _get_obj(obj_name)
+    from_obj = _get_obj(object_from)
+    to_obj = _get_obj(object_to)
+    if not obj or not from_obj or not to_obj: return {"status": "error"}
+    mod = obj.modifiers.new(name="Warp", type='WARP')
+    mod.object_from = from_obj
+    mod.object_to = to_obj
+    return {"status": "success", "name": mod.name}
 
-def add_warp_modifier(name, object_from, object_to, strength=1.0):
-    obj_from = bpy.data.objects.get(object_from)
-    obj_to = bpy.data.objects.get(object_to)
-    return add_modifier(name, type='WARP', object_from=obj_from, object_to=obj_to, strength=strength)
+def add_wave_modifier(obj_name, height=0.5, width=1.5):
+    obj = _get_obj(obj_name)
+    if not obj: return {"status": "error"}
+    mod = obj.modifiers.new(name="Wave", type='WAVE')
+    mod.height = height
+    mod.width = width
+    return {"status": "success", "name": mod.name}
 
-def add_wave_modifier(name, motion='X', speed=0.25, height=0.5, width=1.5, narrowness=1.5):
-    use_x = 'X' in motion
-    use_y = 'Y' in motion
-    return add_modifier(name, type='WAVE', use_x=use_x, use_y=use_y, speed=speed, height=height, width=width, narrowness=narrowness)
+def add_cast_modifier(obj_name, type='SPHERE', factor=0.5):
+    obj = _get_obj(obj_name)
+    if not obj: return {"status": "error"}
+    mod = obj.modifiers.new(name="Cast", type='CAST')
+    mod.cast_type = type
+    mod.factor = factor
+    return {"status": "success", "name": mod.name}
 
-def add_cast_modifier(name, cast_type='SPHERE', factor=0.5, radius=0.0):
-    return add_modifier(name, type='CAST', cast_type=cast_type, factor=factor, radius=radius)
+def add_surface_deform_modifier(obj_name, target_name):
+    obj = _get_obj(obj_name)
+    target = _get_obj(target_name)
+    if not obj or not target: return {"status": "error"}
+    mod = obj.modifiers.new(name="SurfaceDeform", type='SURFACE_DEFORM')
+    mod.target = target
+    return {"status": "success", "name": mod.name}
 
-def add_surface_deform_modifier(name, target):
-    target_obj = bpy.data.objects.get(target)
-    return add_modifier(name, type='SURFACE_DEFORM', target=target_obj)
+def add_mesh_deform_modifier(obj_name, target_name):
+    obj = _get_obj(obj_name)
+    target = _get_obj(target_name)
+    if not obj or not target: return {"status": "error"}
+    mod = obj.modifiers.new(name="MeshDeform", type='MESH_DEFORM')
+    mod.object = target
+    return {"status": "success", "name": mod.name}
 
-def add_mesh_deform_modifier(name, target, precision=5):
-    target_obj = bpy.data.objects.get(target)
-    return add_modifier(name, type='MESH_DEFORM', object=target_obj, precision=precision)
+def add_smooth_corrective_modifier(obj_name, factor=0.5, iterations=5):
+    obj = _get_obj(obj_name)
+    if not obj: return {"status": "error"}
+    mod = obj.modifiers.new(name="SmoothCorrective", type='CORRECTIVE_SMOOTH')
+    mod.factor = factor
+    mod.iterations = iterations
+    return {"status": "success", "name": mod.name}
 
-def add_smooth_corrective_modifier(name, factor=1.0, repeat=5):
-    return add_modifier(name, type='CORRECTIVE_SMOOTH', factor=factor, iterations=repeat)
+def add_laplacian_smooth_modifier(obj_name, lambda_factor=0.01, iterations=5):
+    obj = _get_obj(obj_name)
+    if not obj: return {"status": "error"}
+    mod = obj.modifiers.new(name="LaplacianSmooth", type='LAPLACIANSMOOTH')
+    mod.lambda_factor = lambda_factor
+    mod.iterations = iterations
+    return {"status": "success", "name": mod.name}
 
-def add_laplacian_smooth_modifier(name, lambda_factor=0.5, repeat=1):
-    return add_modifier(name, type='LAPLACIANSMOOTH', lambda_factor=lambda_factor, iterations=repeat)
+def add_hook_modifier(obj_name, target_name):
+    obj = _get_obj(obj_name)
+    target = _get_obj(target_name)
+    if not obj or not target: return {"status": "error"}
+    mod = obj.modifiers.new(name="Hook", type='HOOK')
+    mod.object = target
+    return {"status": "success", "name": mod.name}
 
-def add_hook_modifier(name, object_hook):
-    hook_obj = bpy.data.objects.get(object_hook)
-    return add_modifier(name, type='HOOK', object=hook_obj)
+def add_lattice_modifier(obj_name, target_name):
+    obj = _get_obj(obj_name)
+    target = _get_obj(target_name)
+    if not obj or not target: return {"status": "error"}
+    mod = obj.modifiers.new(name="Lattice", type='LATTICE')
+    mod.object = target
+    return {"status": "success", "name": mod.name}
 
-def add_lattice_modifier(name, lattice):
-    lattice_obj = bpy.data.objects.get(lattice)
-    return add_modifier(name, type='LATTICE', object=lattice_obj)
+def add_shrinkwrap_modifier(obj_name, target_name):
+    obj = _get_obj(obj_name)
+    target = _get_obj(target_name)
+    if not obj or not target: return {"status": "error"}
+    mod = obj.modifiers.new(name="Shrinkwrap", type='SHRINKWRAP')
+    mod.target = target
+    return {"status": "success", "name": mod.name}
 
-def add_shrinkwrap_modifier(name, target):
-    target_obj = bpy.data.objects.get(target)
-    return add_modifier(name, type='SHRINKWRAP', target=target_obj)
+def add_data_transfer_modifier(obj_name, target_name):
+    obj = _get_obj(obj_name)
+    target = _get_obj(target_name)
+    if not obj or not target: return {"status": "error"}
+    mod = obj.modifiers.new(name="DataTransfer", type='DATA_TRANSFER')
+    mod.object = target
+    return {"status": "success", "name": mod.name}
 
-def add_data_transfer_modifier(name, target):
-    target_obj = bpy.data.objects.get(target)
-    return add_modifier(name, type='DATA_TRANSFER', object=target_obj)
+def add_weighted_normal_modifier(obj_name):
+    obj = _get_obj(obj_name)
+    if not obj: return {"status": "error"}
+    mod = obj.modifiers.new(name="WeightedNormal", type='WEIGHTED_NORMAL')
+    return {"status": "success", "name": mod.name}
 
-def add_weighted_normal_modifier(name):
-    return add_modifier(name, type='WEIGHTED_NORMAL')
+def add_mask_modifier(obj_name):
+    obj = _get_obj(obj_name)
+    if not obj: return {"status": "error"}
+    mod = obj.modifiers.new(name="Mask", type='MASK')
+    return {"status": "success", "name": mod.name}
