@@ -4,7 +4,7 @@ from .tools import (
     sculpt,
     object, mesh, material, light, modifier,
     physics, node, animation, collection,
-    scene, selection, constraint, io, asset
+    scene, selection, constraint, io, asset, uv, rigging, gpencil, compositor, sequencer, paint, driver, hair, workspace, data
 )
 
 class AtomicEngine:
@@ -297,6 +297,65 @@ class AtomicEngine:
             "setup_glass_material": asset.setup_glass_material,
             "setup_emission_material": asset.setup_emission_material,
             "setup_car_paint_material": asset.setup_car_paint_material,
+            # UV Mapping
+            "unwrap_mesh": uv.unwrap_mesh,
+            "smart_uv_project": uv.smart_uv_project,
+            "pack_uvs": uv.pack_uvs,
+            "create_uv_map": uv.create_uv_map,
+
+            # Rigging
+            "create_armature": rigging.create_armature,
+            "add_bone": rigging.add_bone,
+            "parent_to_armature": rigging.parent_to_armature,
+            "set_bone_transform": rigging.set_bone_transform,
+
+            # Grease Pencil
+            "add_gpencil_object": gpencil.add_gpencil_object,
+            "add_gpencil_layer": gpencil.add_gpencil_layer,
+            "draw_gpencil_stroke": gpencil.draw_gpencil_stroke,
+            "set_gpencil_material": gpencil.set_gpencil_material,
+
+            # Compositor
+            "enable_compositor": compositor.enable_compositor,
+            "add_compositor_node": compositor.add_compositor_node,
+            "connect_compositor_nodes": compositor.connect_compositor_nodes,
+            "set_compositor_node_property": compositor.set_compositor_node_property,
+
+            # Sequencer
+            "add_movie_strip": sequencer.add_movie_strip,
+            "add_image_strip": sequencer.add_image_strip,
+            "add_sound_strip": sequencer.add_sound_strip,
+            "set_strip_transform": sequencer.set_strip_transform,
+
+            # Painting
+            "set_paint_mode": paint.set_paint_mode,
+            "create_vertex_group": paint.create_vertex_group,
+            "assign_to_vertex_group": paint.assign_to_vertex_group,
+            "fill_vertex_color": paint.fill_vertex_color,
+
+            # Drivers
+            "add_driver": driver.add_driver,
+            "remove_driver": driver.remove_driver,
+            "add_driver_variable": driver.add_driver_variable,
+            "set_driver_expression": driver.set_driver_expression,
+
+            # Hair
+            "add_hair_curves": hair.add_hair_curves,
+            "set_hair_resolution": hair.set_hair_resolution,
+            "generate_hair_from_mesh": hair.generate_hair_from_mesh,
+            "set_hair_radius": hair.set_hair_radius,
+
+            # Workspace
+            "set_workspace": workspace.set_workspace,
+            "set_view_transform": workspace.set_view_transform,
+            "toggle_fullscreen": workspace.toggle_fullscreen,
+            "set_shading_mode": workspace.set_shading_mode,
+
+            # Data
+            "set_custom_property": data.set_custom_property,
+            "get_custom_property": data.get_custom_property,
+            "add_attribute": data.add_attribute,
+            "remove_custom_property": data.remove_custom_property,
         }
 
     def execute_tool(self, tool_name, args=None):
